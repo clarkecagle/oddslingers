@@ -4,8 +4,7 @@
 # docker-compose run django ./manage.py createsuperuser
 # docker-compose up
 
-
-version: '3'
+version: "3"
 
 volumes:
   node_modules:
@@ -16,7 +15,7 @@ services:
     ports:
       - 80:80
       - 443:443
-    links: 
+    links:
       - "django"
     volumes:
       - ./etc/nginx/oddslingers-docker-compose.prod.conf:/etc/nginx/nginx.conf
@@ -53,7 +52,7 @@ services:
     command: daphne -b 0.0.0.0 -p 8000 oddslingers.asgi:channel_layer
     stdin_open: true
     tty: true
-    depends_on: 
+    depends_on:
       - postgres
       - redis
     environment:
@@ -65,7 +64,7 @@ services:
     env_file:
       - ./env/prod-docker.env
       - ./.secrets-prod.env
-    expose: 
+    expose:
       - 8000
     volumes:
       - ./data:/opt/oddslingers.poker/data
@@ -123,7 +122,7 @@ services:
 
   webpack:
     build:
-      context: . 
+      context: .
       dockerfile: ./Dockerfile.webpack
     image: oddslingers:webpack
     command: sh -c "(webpack --mode development --watch --info-verbosity verbose & node-sass-chokidar --watch scss/ -o ../static/css 2>&1  &)| cat"
@@ -139,7 +138,6 @@ services:
       # Add dumps for UI tests
       - ./core/dumps:/opt/oddslingers.poker/core/dumps
 
-
   dramatiq:
     image: oddslingers:django_base
     working_dir: /opt/oddslingers.poker/core/
@@ -150,7 +148,7 @@ services:
       REDIS_HOST: redis
     cap_add:
       - SYS_NICE
-    depends_on: 
+    depends_on:
       - redis
       - postgres
     env_file:
@@ -161,10 +159,10 @@ services:
       - ./core:/opt/oddslingers.poker/core
       - ./bin:/opt/oddslingers.poker/bin
       - ./etc:/opt/oddslingers.poker/etc
- 
+
   cloudflare:
     image: cloudflare/cloudflared
-    network_mode: 'service:nginx'
+    network_mode: "service:nginx"
     command: tunnel --no-autoupdate --hostname oddslingers.zervice.io http://nginx
     depends_on:
       - django
@@ -180,7 +178,7 @@ services:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
       IS_DOCKER: 1
-    depends_on: 
+    depends_on:
       - redis
       - postgres
     env_file:

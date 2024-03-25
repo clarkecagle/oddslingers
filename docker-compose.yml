@@ -4,8 +4,7 @@
 # docker-compose run django ./manage.py createsuperuser
 # docker-compose up
 
-
-version: '3'
+version: "3"
 
 volumes:
   node_modules:
@@ -16,7 +15,7 @@ services:
     ports:
       - 80:80
       - 443:443
-    links: 
+    links:
       - "django"
     volumes:
       - ./etc/nginx/oddslingers-docker-compose.conf:/etc/nginx/nginx.conf
@@ -45,10 +44,10 @@ services:
     build: .
     image: oddslingers:django_base
     working_dir: /opt/oddslingers.poker/core/
-    command: ./manage.py runserver --http_timeout 120 0.0.0.0:8000 
+    command: ./manage.py runserver --http_timeout 120 0.0.0.0:8000
     stdin_open: true
     tty: true
-    depends_on: 
+    depends_on:
       - postgres
       - redis
     environment:
@@ -59,17 +58,17 @@ services:
     env_file:
       - .env
       - .secrets.env
-    expose: 
+    expose:
       - 8000
     volumes:
       - ./data:/opt/oddslingers.poker/data
-      - ./core:/opt/oddslingers.poker/core
+      - ./core:/opt/oddslingers.poker/core:consistent
       - ./bin:/opt/oddslingers.poker/bin
 
   webpack:
     #image: node:8-alpine
     build:
-      context: . 
+      context: .
       dockerfile: ./Dockerfile.webpack
     image: oddslingers:webpack
     command: sh -c "(webpack --mode development --watch --info-verbosity verbose & saas --watch scss/ -o ../static/css 2>&1  &)| cat"
@@ -85,7 +84,6 @@ services:
       # Add dumps for UI tests
       - ./core/dumps:/opt/oddslingers.poker/core/dumps
 
-
   dramatiq:
     image: oddslingers:django_base
     working_dir: /opt/oddslingers.poker/core/
@@ -96,7 +94,7 @@ services:
       REDIS_HOST: redis
     cap_add:
       - SYS_NICE
-    depends_on: 
+    depends_on:
       - redis
       - postgres
     env_file:
@@ -106,7 +104,7 @@ services:
       - ./data:/opt/oddslingers.poker/data
       - ./core:/opt/oddslingers.poker/core
       - ./bin:/opt/oddslingers.poker/bin
- 
+
       #TODO: Fish script sourcing
   yacron:
     image: oddslingers:django_base
@@ -116,7 +114,7 @@ services:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
       IS_DOCKER: 1
-    depends_on: 
+    depends_on:
       - redis
       - postgres
     env_file:
